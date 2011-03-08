@@ -1,0 +1,15 @@
+{
+    "name" : "Convert Mycaches",
+    "version" : "0.0.1",
+    "description" : "Convert html from My Caches page to a format suitable for Livejournal posting.",
+    "icons" : { 
+	"16" : "cvtmyc16.png",
+	"48" : "cvtmyc48.png",
+	"128" : "cvtmyc.png" 
+    },
+    "app" : {
+	"launch" : {
+	    "local_path" : "cvtmyc.htm"
+	}
+    }
+}

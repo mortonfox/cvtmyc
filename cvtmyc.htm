@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="author" content="Po Shan Cheah" />
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta http-equiv="Content-Language" content="en-us" />
+
+<title>My Caches Converter</title>
+
+<script type="text/javascript">
+
+// Clear output area.
+function clearOutput() {
+    var output = document.getElementById("output");
+    while (output.firstChild) {
+	output.removeChild(output.firstChild);
+    }
+
+    var resultfield = document.getElementById('result');
+    resultfield.value = '';
+}
+
+// Write a string with a newline to the output area.
+function writeln(str) {
+    var output = document.getElementById("output");
+    var txt = document.createTextNode(str);
+    var newline = document.createElement("br");
+    output.appendChild(txt);
+    output.appendChild(newline);
+
+    var resultfield = document.getElementById('result');
+    resultfield.value += str + '\n';
+}
+
+// Get the content of the n'th element in a series of elements.
+function xml_get_matches(xmlstr, elem) {
+    var re = new RegExp("<" + elem + "(?:\\s[^>]*)?>([\\s\\S]*?)<\/"+elem+">", "gi");
+    var matches = [];
+    var match = re.exec(xmlstr);
+    while (match !== null) {
+	matches.push(match[1]);
+	match = re.exec(xmlstr);
+    }
+    return matches;
+}
+
+function trim(s) {
+    return s.replace(/^\s+|\s+$/g, '');
+}
+
+function main() {
+    var mycInput = document.getElementById("mycInput").value;
+    clearOutput();
+
+    var m1reg = 'http://www\\.geocaching\\.com/seek/cache_details\\.aspx[^"]*';
+    var m1 = new RegExp(m1reg, 'i');
+    var m2 = new RegExp('<a\\s+href="' + m1reg + '">(.*)<\/a>', 'i');
+
+    var outitems = [];
+    var logitems = xml_get_matches(mycInput, 'tr');
+    var i;
+    for (i = 0; i < logitems.length; ++i) {
+	var logitem = logitems[i];
+	var logelems = xml_get_matches(logitem, 'td');
+	var linkitem = logelems[2];
+
+	var linkstr = linkitem.match(m1);
+	if (linkstr !== null) {
+
+	    var matchres = m2.exec(linkitem);
+	    var name = matchres[1];
+
+	    var state = trim(logelems[3]);
+
+	    outitems.unshift('<a href="' + linkstr + '">' + 
+		    name + ' (' + state + ')<\/a>');
+	}
+    }
+
+    writeln('<lj-cut text="The caches...">');
+    writeln('<div style="margin: 10px 30px; border: 1px dashed; padding: 10px;">');
+    for (i = 0; i < outitems.length; ++i) {
+	writeln(outitems[i]);
+    }
+    writeln('<\/div>');
+    writeln('<\/lj-cut>');
+    return true;
+}
+
+function selectAll(id) {
+    var field = document.getElementById(id);
+    field.focus();
+    field.select();
+}
+
+</script>
+</head>
+
+<body>
+    <h1>My Caches Converter</h1>
+    <form action="#" onsubmit="main(); return false;"> 
+	Paste HTML that needs to be converted below:<br />
+	<textarea rows="8" cols="75" id="mycInput" name="mycInput"></textarea>
+	<br />
+	<input type="submit" value="Go">
+    </form>
+    <br />
+    <form action="#" onsubmit="return false;">
+	Result:<br />
+	<textarea rows="20" cols="75" id="result" name="result" 
+	    onclick="selectAll('result');"></textarea>
+    </form>
+    <br />
+    <hr />
+    <br />
+    <div id="output"></div>
+</body>
+</html>
+<!--
+Last updated: March 8, 2011
+-->
+<!-- vim:set tw=0: -->
